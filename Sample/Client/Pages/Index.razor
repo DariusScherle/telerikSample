@@ -1,0 +1,249 @@
+﻿@page "/"
+@using FluentValidation
+
+Int
+<br />
+<TelerikButton Icon="plus" OnClick="@(() => Open("editform","int"))">Show Editform with int</TelerikButton>
+<TelerikButton Icon="plus" OnClick="@(() => Open("telerikform","int"))">Show TelerikEditform with int</TelerikButton>
+<br/>
+Bool
+<br />
+<TelerikButton Icon="plus" OnClick="@(() => Open("editform","bool"))">Show Editform with bool</TelerikButton>
+<TelerikButton Icon="plus" OnClick="@(() => Open("telerikform","bool"))">Show TelerikEditform with bool</TelerikButton>
+<br />
+Date
+<br />
+<TelerikButton Icon="plus" OnClick="@(() => Open("editform","date"))">Show Editform with date</TelerikButton>
+<TelerikButton Icon="plus" OnClick="@(() => Open("telerikform","date"))">Show TelerikEditform with date</TelerikButton>
+
+<TelerikWindow Visible="_showTelerikEditForm" Modal="true" Width="800px">
+    <WindowTitle>
+        @{
+            <strong>
+                Test
+            </strong>
+        }
+    </WindowTitle>
+    <WindowActions>
+        <WindowAction Name="Maximize"></WindowAction>
+        <WindowAction OnClick="Cancel" Name="Close"></WindowAction>
+    </WindowActions>
+    <WindowContent>
+        <TelerikForm Model="SelectedItem" OnValidSubmit="Save" Orientation="FormOrientation.Horizontal">
+            <FormValidation>
+                <FluentValidationValidator Validator="_validator" DisableAssemblyScanning="true" />
+            </FormValidation>
+            <FormItems>
+                <FormItem Field="@nameof(SelectedItem.Deutsch)" LabelText="German" />
+                <FormItem Field="@nameof(SelectedItem.Franzoesisch)" LabelText="French" />
+                <FormItem Field="@nameof(SelectedItem.Italienisch)" LabelText="Italian" />
+                <FormItem Field="@nameof(SelectedItem.Englisch)" LabelText="English" />
+                <FormItem>
+                    <Template>
+                        <label for="value" class="k-label k-form-label">Value</label>
+                        @if (_valueInt != null)
+                        {
+                            <TelerikNumericTextBox Id="value" @bind-Value="_valueInt" />
+                        }
+                        else if (_valueBool != null)
+                        {
+                            <TelerikCheckBox Id="value" @bind-Value="_valueBool" />
+                        }
+                        else if (_valueDate != null)
+                        {
+                            <TelerikDatePicker Id="value" @bind-Value="_valueDate" Format="m" />
+                        }
+                    </Template>
+                </FormItem>
+            </FormItems>
+        </TelerikForm>
+    </WindowContent>
+</TelerikWindow>
+
+<TelerikWindow Visible="_showEditForm" Modal="true" Width="800px">
+    <WindowTitle>
+        @{
+            <strong>
+                Test
+            </strong>
+        }
+    </WindowTitle>
+    <WindowActions>
+        <WindowAction Name="Maximize"></WindowAction>
+        <WindowAction OnClick="Cancel" Name="Close"></WindowAction>
+    </WindowActions>
+    <WindowContent>
+        <EditForm Model="@SelectedItem" OnValidSubmit="@Save">
+            <FluentValidationValidator Validator="_validator" />
+            <div class="k-edit-form-container">
+
+                <div class="k-edit-label">
+                    Deutsch
+                </div>
+                <div class="k-edit-field">
+                    <TelerikTextBox Id="textbox_de" @bind-Value="@SelectedItem.Deutsch" />
+                    <ValidationMessage For="() => SelectedItem.Deutsch" />
+                </div>
+
+                <div class="k-edit-label">
+                    French
+                </div>
+                <div class="k-edit-field">
+                    <TelerikTextBox Id="textbox_fr" @bind-Value="@SelectedItem.Franzoesisch" />
+                    <ValidationMessage For="() => SelectedItem.Franzoesisch" />
+                </div>
+
+                <div class="k-edit-label">
+                    Italian
+                </div>
+                <div class="k-edit-field">
+                    <TelerikTextBox Id="textbox_it" @bind-Value="@SelectedItem.Italienisch" />
+                    <ValidationMessage For="() => SelectedItem.Italienisch" />
+                </div>
+
+                <div class="k-edit-label">
+                    English
+                </div>
+                <div class="k-edit-field">
+                    <TelerikTextBox Id="textbox_en" @bind-Value="@SelectedItem.Englisch" />
+                    <ValidationMessage For="() => SelectedItem.Englisch" />
+                </div>
+
+                <div class="k-edit-label">
+                    Value
+                </div>
+                <div class="k-edit-field">
+                    @{
+                        @if (_valueInt != null)
+                        {
+                            <TelerikNumericTextBox Id="textbox_value" @bind-Value="_valueInt" />
+                        }
+                        else if (_valueBool != null)
+                        {
+                            <TelerikCheckBox @bind-Value="_valueBool" />
+                        }
+                        else if (_valueDate != null)
+                        {
+                            <TelerikDatePicker @bind-Value="_valueDate" Format="m" />
+                        }
+                    }
+                </div>
+                <div class="k-edit-buttons" style="border: 0">
+                    <TelerikButton ButtonType="ButtonType.Submit" Icon="save" />
+                </div>
+            </div>
+        </EditForm>
+    </WindowContent>
+</TelerikWindow>
+
+@code {
+
+    private Config SelectedItem { get; set; }
+    private readonly ConfigValidator _validator = new();
+
+    private bool _showEditForm;
+    private bool _showTelerikEditForm;
+
+    private Int32? _valueInt;
+    private bool? _valueBool;
+    private DateTime? _valueDate;
+
+    private void Open(string form, string selectedItem)
+    {
+        if (selectedItem == "bool")
+        {
+            SelectedItem = new Config()
+            {
+                Deutsch = "BoolValue German",
+                Englisch = "BoolValue English",
+                Franzoesisch = "BoolValue French",
+                Italienisch = "BoolValue Italian",
+                Wert = "Ja"
+            };
+            _valueBool = SelectedItem.Wert == "Ja";
+            _valueInt = null;
+            _valueDate = null;
+        }
+        else if (selectedItem == "int")
+        {
+            SelectedItem = new Config()
+            {
+                Deutsch = "IntValue German",
+                Englisch = "IntValue English",
+                Franzoesisch = "IntValue French",
+                Italienisch = "IntValue Italian",
+                Wert = "10"
+            };
+            _valueInt = int.Parse(SelectedItem.Wert);
+            _valueDate = null;
+            _valueBool = null;
+        }
+        else if (selectedItem == "date")
+        {
+            SelectedItem = new Config()
+            {
+                Deutsch = "DateValue German",
+                Englisch = "DateValue English",
+                Franzoesisch = "DateValue French",
+                Italienisch = "DateValue Italian",
+                Wert = "27.5"
+            };
+            _valueDate = DateTime.Parse(SelectedItem.Wert);
+            _valueBool = null;
+            _valueInt = null;
+        }
+
+        if (form == "telerikform")
+        {
+            _showTelerikEditForm = true;
+        }
+        else if (form == "editform")
+        {
+            _showEditForm = true;
+        }
+    }
+
+    private void Save()
+    {
+
+    }
+
+    private void Cancel()
+    {
+        _showEditForm = false;
+        _showTelerikEditForm = false;
+    }
+
+    public class Config
+    {
+        public string Wert { get; set; }
+        public string Deutsch { get; set; }
+        public string Franzoesisch { get; set; }
+        public string Italienisch { get; set; }
+        public string Englisch { get; set; }
+    }
+
+    public class ConfigValidator : AbstractValidator<Config>
+    {
+        public ConfigValidator()
+        {
+
+            RuleFor(x => x.Wert)
+                .NotEmpty().WithMessage("not empty")
+                .MinimumLength(1).WithMessage("minimum is 1")
+                .MaximumLength(255).WithMessage("maximum is 255");
+            RuleFor(x => x.Deutsch)
+                .MinimumLength(1).WithMessage("minimum is 1")
+                .MaximumLength(255).WithMessage("maximum is 255");
+            RuleFor(x => x.Franzoesisch)
+                .MinimumLength(1).WithMessage("minimum is 1")
+                .MaximumLength(255).WithMessage("maximum is 255");
+            RuleFor(x => x.Italienisch)
+                .MinimumLength(1).WithMessage("minimum is 1")
+                .MaximumLength(255).WithMessage("maximum is 255");
+            RuleFor(x => x.Englisch)
+                .MinimumLength(1).WithMessage("minimum is 1")
+                .MaximumLength(255).WithMessage("maximum is 255");
+        }
+    }
+}

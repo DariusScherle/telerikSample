@@ -5,7 +5,7 @@ Int
 <br />
 <TelerikButton Icon="plus" OnClick="@(() => Open("editform","int"))">Show Editform with int</TelerikButton>
 <TelerikButton Icon="plus" OnClick="@(() => Open("telerikform","int"))">Show TelerikEditform with int</TelerikButton>
-<br/>
+<br />
 Bool
 <br />
 <TelerikButton Icon="plus" OnClick="@(() => Open("editform","bool"))">Show Editform with bool</TelerikButton>
@@ -41,17 +41,17 @@ Date
                 <FormItem>
                     <Template>
                         <label for="value" class="k-label k-form-label">Value</label>
-                        @if (_valueInt != null)
+                        @if (SelectedItem._valueInt != null)
                         {
-                            <TelerikNumericTextBox Id="value" @bind-Value="_valueInt" />
+                            <TelerikNumericTextBox Id="value" @bind-Value="SelectedItem._valueInt" />
                         }
-                        else if (_valueBool != null)
+                        else if (SelectedItem._valueBool != null)
                         {
-                            <TelerikCheckBox Id="value" @bind-Value="_valueBool" />
+                            <TelerikCheckBox Id="value" @bind-Value="SelectedItem._valueBool" />
                         }
-                        else if (_valueDate != null)
+                        else if (SelectedItem._valueDate != null)
                         {
-                            <TelerikDatePicker Id="value" @bind-Value="_valueDate" Format="m" />
+                            <TelerikDatePicker Id="value" @bind-Value="SelectedItem._valueDate" Format="m" />
                         }
                     </Template>
                 </FormItem>
@@ -114,17 +114,17 @@ Date
                 </div>
                 <div class="k-edit-field">
                     @{
-                        @if (_valueInt != null)
+                        @if (SelectedItem._valueInt != null)
                         {
-                            <TelerikNumericTextBox Id="textbox_value" @bind-Value="_valueInt" />
+                            <TelerikNumericTextBox Id="textbox_value" @bind-Value="SelectedItem._valueInt" />
                         }
-                        else if (_valueBool != null)
+                        else if (SelectedItem._valueBool != null)
                         {
-                            <TelerikCheckBox @bind-Value="_valueBool" />
+                            <TelerikCheckBox @bind-Value="SelectedItem._valueBool" />
                         }
-                        else if (_valueDate != null)
+                        else if (SelectedItem._valueDate != null)
                         {
-                            <TelerikDatePicker @bind-Value="_valueDate" Format="m" />
+                            <TelerikDatePicker @bind-Value="SelectedItem._valueDate" Format="m" />
                         }
                     }
                 </div>
@@ -139,14 +139,10 @@ Date
 @code {
 
     private Config SelectedItem { get; set; }
-    private readonly ConfigValidator _validator = new();
+    private readonly ConfigValidator _validator = new ConfigValidator();
 
     private bool _showEditForm;
     private bool _showTelerikEditForm;
-
-    private Int32? _valueInt;
-    private bool? _valueBool;
-    private DateTime? _valueDate;
 
     private void Open(string form, string selectedItem)
     {
@@ -160,9 +156,7 @@ Date
                 Italienisch = "BoolValue Italian",
                 Wert = "Ja"
             };
-            _valueBool = SelectedItem.Wert == "Ja";
-            _valueInt = null;
-            _valueDate = null;
+            SelectedItem._valueBool = SelectedItem.Wert == "Ja";
         }
         else if (selectedItem == "int")
         {
@@ -174,9 +168,7 @@ Date
                 Italienisch = "IntValue Italian",
                 Wert = "10"
             };
-            _valueInt = int.Parse(SelectedItem.Wert);
-            _valueDate = null;
-            _valueBool = null;
+            SelectedItem._valueInt = int.Parse(SelectedItem.Wert);
         }
         else if (selectedItem == "date")
         {
@@ -188,9 +180,9 @@ Date
                 Italienisch = "DateValue Italian",
                 Wert = "27.5"
             };
-            _valueDate = DateTime.Parse(SelectedItem.Wert);
-            _valueBool = null;
-            _valueInt = null;
+            //Fix the Formating and Parsing
+            SelectedItem._valueDate = Convert.ToDateTime(SelectedItem.Wert);
+            //_valueDate = DateTime.Parse(SelectedItem.Wert);
         }
 
         if (form == "telerikform")
@@ -214,6 +206,7 @@ Date
         _showTelerikEditForm = false;
     }
 
+    //Added properties in the model
     public class Config
     {
         public string Wert { get; set; }
@@ -221,6 +214,9 @@ Date
         public string Franzoesisch { get; set; }
         public string Italienisch { get; set; }
         public string Englisch { get; set; }
+        public int? _valueInt { get; set; }
+        public bool? _valueBool { get; set; }
+        public DateTime? _valueDate { get; set; }
     }
 
     public class ConfigValidator : AbstractValidator<Config>
